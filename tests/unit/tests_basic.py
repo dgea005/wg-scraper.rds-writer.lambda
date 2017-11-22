@@ -1,4 +1,4 @@
 import pytest
 
-def empty_test_func():
+def test_func():
     pass

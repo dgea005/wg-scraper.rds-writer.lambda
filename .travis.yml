@@ -15,7 +15,7 @@ install:
 
 script:
   # run tests
-  - py.test -vv -r sxX
+  - pytest tests/unit/tests_basic.py
 
 before_deploy:
   - make
