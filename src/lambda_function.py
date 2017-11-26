@@ -33,7 +33,7 @@ def lambda_handler(event, context):
        payload=base64.b64decode(record["kinesis"]["data"])
        #print("Decoded payload: " + str(payload))
        data = json.loads(payload)
-       print("Loaded payload: " + json.dumps(data))
+       print("Loaded payload: " + str(data))
        
 
 # def lambda_handler(event, context):
