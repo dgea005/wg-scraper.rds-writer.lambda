@@ -79,7 +79,7 @@ def transform_to_postgres_query(transformed_dict):
     returns: query string to be inserted
     """
     orderedKeys = list(transformed_dict.keys())
-    orderedValues = [x[1] for x in transformed_dict.items()]
+    orderedValues = [str(x[1]) for x in transformed_dict.items()]
 
     # construct query
     orderedKeyString = ', '.join(orderedKeys)
