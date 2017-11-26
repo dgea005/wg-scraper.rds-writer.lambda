@@ -4,6 +4,7 @@ import base64
 import asyncio
 import asyncpg
 import json
+from collections import OrderedDict
 from dateutil.parser import parse
 
 logger = logging.getLogger()
@@ -13,20 +14,7 @@ DB_USER = os.environ['db_user']
 DB_PASS = os.environ['db_pass']
 DB_ENDPOINT = os.environ['db_endpoint']
 
-# schema will be this
-# but should add event_name
-# meta_created_at
-# event version
-    # listing_id INTEGER DEFAULT NULL,
-    # link TEXT DEFAULT NULL,
-    # cost SMALLINT DEFAULT NULL,
-    # size SMALLINT DEFAULT NULL,
-    # stadt TEXT DEFAULT NULL,
-    # free_from DATE DEFAULT NULL,
-    # free_to DATE DEFAULT NULL,
-    # stay_length SMALLINT DEFAULT NULL,
-    # scrape_time TIMESTAMP DEFAULT NULL,
-    # flat_type VARCHAR(50) DEFAULT '---'
+
 
 def lambda_handler(event, context):
     for record in event['Records']:
@@ -35,7 +23,9 @@ def lambda_handler(event, context):
        #print("Decoded payload: " + str(payload))
        data = json.loads(payload)
        transformed = transform_wg_data(data)
-       print("Loaded payload: " + str(transformed))
+       #print("Loaded payload: " + str(transformed))
+       query = transform_to_postgres_query(transformed_dict=transformed)
+       print(query)
 
 
 def validate_event(data):
@@ -67,7 +57,8 @@ def transform_wg_data(data):
     should wrap call in try except to say if data could be transformed
     """
     # some of this is probably not necessary
-    transformed_data = dict()
+    # orderedDict to ensure construction in correct order
+    transformed_data = OrderedDict()
     transformed_data['listing_id'] = int(data['listing_id'])
     transformed_data['link'] = str(data['link'])
     transformed_data['cost'] = int(data['cost'])
@@ -81,13 +72,23 @@ def transform_wg_data(data):
     transformed_data['flat_type'] = str(data['flat_type'])
     return transformed_data
 
-def transform_to_postgres_input(transformed_dict):
+def transform_to_postgres_query(transformed_dict):
     """
     transform validated data into data that can be inserted to database
 
     returns: query string to be inserted
     """
-    pass
+    orderedKeys = list(transformed_dict.keys())
+    orderedValues = [x[1] for x in transformed_dict.items()]
+
+    # construct query
+    orderedKeyString = ', '.join(orderedKeys)
+    orderedValueString = ', '.join(orderedValues)
+    query = f"INSERT INTO index_raw ({orderedKeyString}) VALUES ({orderedValueString});"
+
+    return query
+
+
 
        
 
