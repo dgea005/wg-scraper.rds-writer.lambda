@@ -85,7 +85,7 @@ def transform_to_postgres_query(transformed_dict):
 
     # construct query
     orderedKeyString = ', '.join(orderedKeys)
-    orderedValueString = ', '.join(orderedValues)
+    orderedValueString = '"' + '", "'.join(orderedValues) + '"'
     query = f"INSERT INTO index_raw ({orderedKeyString}) VALUES ({orderedValueString});"
 
     return query
