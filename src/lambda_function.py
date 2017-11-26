@@ -18,14 +18,16 @@ DB_ENDPOINT = os.environ['db_endpoint']
 
 def lambda_handler(event, context):
     for record in event['Records']:
-       #Kinesis data is base64 encoded so decode here
-       payload=base64.b64decode(record["kinesis"]["data"])
-       #print("Decoded payload: " + str(payload))
-       data = json.loads(payload)
-       transformed = transform_wg_data(data)
-       #print("Loaded payload: " + str(transformed))
-       query = transform_to_postgres_query(transformed_dict=transformed)
-       print(query)
+        #Kinesis data is base64 encoded so decode here
+        payload=base64.b64decode(record["kinesis"]["data"])
+        #print("Decoded payload: " + str(payload))
+        data = json.loads(payload)
+        transformed = transform_wg_data(data)
+        #print("Loaded payload: " + str(transformed))
+        query = transform_to_postgres_query(transformed_dict=transformed)
+        print(query)
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(run(query=query))
 
 
 def validate_event(data):
@@ -89,13 +91,16 @@ def transform_to_postgres_query(transformed_dict):
     return query
 
 
+async def run(query):
+    conn = await asyncpg.connect(user=DB_USER, password=DB_PASS, database='ScraperDatabase', host=DB_ENDPOINT)
+    await conn.execute(query)
+    await conn.close()
 
        
 
 # def lambda_handler(event, context):
 
-#     loop = asyncio.get_event_loop()
-#     loop.run_until_complete(run())
+
 #     return
 
 # query = """
@@ -103,7 +108,3 @@ def transform_to_postgres_query(transformed_dict):
 #   VALUES  (630515, 'http://some_link', 400, 18, 'Mitte', '2017-08-27', '2017-09-23', 27, '2017-08-24 07:20:13', 'studio');
 # """
 
-# async def run():
-#     conn = await asyncpg.connect(user=DB_USER, password=DB_PASS, database='ScraperDatabase', host=DB_ENDPOINT)
-#     await conn.execute(query)
-#     await conn.close()
