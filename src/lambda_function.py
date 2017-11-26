@@ -58,20 +58,21 @@ def transform_wg_data(data):
 
     should wrap call in try except to say if data could be transformed
     """
-    # some of this is probably not necessary
     # orderedDict to ensure construction in correct order
+    # insert statement value formatting prepared here
+    # some kind of mapping function depending on the type would be useful
     transformed_data = OrderedDict()
     transformed_data['listing_id'] = int(data['listing_id'])
-    transformed_data['link'] = str(data['link'])
+    transformed_data['link'] = '"' + str(data['link']) + '"'
     transformed_data['cost'] = int(data['cost'])
     transformed_data['size'] = int(data['size'])
-    transformed_data['stadt'] = str(data['stadt'])
+    transformed_data['stadt'] = '"' + str(data['stadt']) + '"'
     ## will need empty error handling here
-    transformed_data['free_from'] = parse(data['free_from']).date()
-    transformed_data['free_to'] = parse(data['free_to']).date()
+    transformed_data['free_from'] = '"' + str(parse(data['free_from']).date()) + '"'
+    transformed_data['free_to'] = '"' + str(parse(data['free_to']).date()) + '"'
     transformed_data['stay_length'] = int(data['stay_length'])
-    transformed_data['scrape_time'] = parse(data['scrape_time'])
-    transformed_data['flat_type'] = str(data['flat_type'])
+    transformed_data['scrape_time'] = '"' + str(parse(data['scrape_time'])) + '"'
+    transformed_data['flat_type'] = '"' + str(data['flat_type']) + '"'
     return transformed_data
 
 def transform_to_postgres_query(transformed_dict):
@@ -85,7 +86,7 @@ def transform_to_postgres_query(transformed_dict):
 
     # construct query
     orderedKeyString = ', '.join(orderedKeys)
-    orderedValueString = '"' + '", "'.join(orderedValues) + '"'
+    orderedValueString = ', '.join(orderedValues)
     query = f"INSERT INTO index_raw ({orderedKeyString}) VALUES ({orderedValueString});"
 
     return query
