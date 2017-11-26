@@ -74,8 +74,8 @@ def transform_wg_data(data):
     transformed_data['size'] = int(data['size'])
     transformed_data['stadt'] = str(data['stadt'])
     ## will need empty error handling here
-    transformed_data['free_from'] = parse(data['free_from'].date())
-    transformed_data['free_to'] = parse(data['free_to'].date())
+    transformed_data['free_from'] = parse(data['free_from']).date()
+    transformed_data['free_to'] = parse(data['free_to']).date()
     transformed_data['stay_length'] = int(data['stay_length'])
     transformed_data['scrape_time'] = parse(data['scrape_time'])
     transformed_data['flat_type'] = str(data['flat_type'])
