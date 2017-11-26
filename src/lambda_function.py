@@ -32,7 +32,7 @@ def lambda_handler(event, context):
        #Kinesis data is base64 encoded so decode here
        payload=base64.b64decode(record["kinesis"]["data"])
        #print("Decoded payload: " + str(payload))
-       data = json.loads(str(payload))
+       data = json.loads(payload)
        print("Loaded payload: " + data)
 
 # def lambda_handler(event, context):
