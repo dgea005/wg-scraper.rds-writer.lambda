@@ -4,7 +4,6 @@ import base64
 import asyncio
 import asyncpg
 import json
-from io import StringIO
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -33,7 +32,7 @@ def lambda_handler(event, context):
        #Kinesis data is base64 encoded so decode here
        payload=base64.b64decode(record["kinesis"]["data"])
        #print("Decoded payload: " + str(payload))
-       data = json.loads(StringIO(str(payload)))
+       data = json.loads(str(payload))
        print("Loaded payload: " + data)
 
 # def lambda_handler(event, context):
