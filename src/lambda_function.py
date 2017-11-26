@@ -14,8 +14,6 @@ DB_USER = os.environ['db_user']
 DB_PASS = os.environ['db_pass']
 DB_ENDPOINT = os.environ['db_endpoint']
 
-
-
 def lambda_handler(event, context):
     for record in event['Records']:
         #Kinesis data is base64 encoded so decode here
@@ -28,7 +26,6 @@ def lambda_handler(event, context):
         print(query)
         loop = asyncio.get_event_loop()
         loop.run_until_complete(run(query=query))
-
 
 def validate_event(data):
     """
@@ -44,7 +41,6 @@ def validate_event(data):
 
     pass
 
-
 def transform_wg_data(data):
     ## could have different event names
     ## depending on the event name then call different versions of this function
@@ -54,9 +50,7 @@ def transform_wg_data(data):
     if event is valid and event name is index_v0
     then transform to python data types with this function
 
-    returns: transform data dictionary
-
-    should wrap call in try except to say if data could be transformed
+    returns: transformed data dictionary
     """
     # orderedDict to ensure construction in correct order
     # insert statement value formatting prepared here
@@ -83,12 +77,10 @@ def transform_to_postgres_query(transformed_dict):
     """
     orderedKeys = list(transformed_dict.keys())
     orderedValues = [str(x[1]) for x in transformed_dict.items()]
-
     # construct query
     orderedKeyString = ', '.join(orderedKeys)
     orderedValueString = ', '.join(orderedValues)
     query = f"INSERT INTO index_raw ({orderedKeyString}) VALUES ({orderedValueString});"
-
     return query
 
 
@@ -96,16 +88,4 @@ async def run(query):
     conn = await asyncpg.connect(user=DB_USER, password=DB_PASS, database='ScraperDatabase', host=DB_ENDPOINT)
     await conn.execute(query)
     await conn.close()
-
-       
-
-# def lambda_handler(event, context):
-
-
-#     return
-
-# query = """
-# INSERT INTO index_raw (listing_id, link, cost, size, stadt, free_from, free_to, stay_length, scrape_time, flat_type)
-#   VALUES  (630515, 'http://some_link', 400, 18, 'Mitte', '2017-08-27', '2017-09-23', 27, '2017-08-24 07:20:13', 'studio');
-# """
 
