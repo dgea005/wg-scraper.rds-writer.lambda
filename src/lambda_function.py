@@ -18,10 +18,12 @@ def lambda_handler(event, context):
     for record in event['Records']:
         #Kinesis data is base64 encoded so decode here
         payload=base64.b64decode(record["kinesis"]["data"])
-        #print("Decoded payload: " + str(payload))
+        print("Decoded payload: ")
+        print(str(payload))
         data = json.loads(payload)
         transformed = transform_wg_data(data)
-        #print("Loaded payload: " + str(transformed))
+        print("Loaded payload: ")
+        print(str(transformed))
         query = transform_to_postgres_query(transformed_dict=transformed)
         print(query)
         loop = asyncio.get_event_loop()
