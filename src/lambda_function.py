@@ -21,6 +21,8 @@ def lambda_handler(event, context):
         print("Decoded payload: ")
         print(str(payload))
         data = json.loads(payload)
+        print(str(data))
+        print(type(data))
         transformed = transform_wg_data(data)
         print("Loaded payload: ")
         print(str(transformed))
