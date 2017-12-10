@@ -68,12 +68,12 @@ def transform_wg_data(data):
     try:
         transformed_data['free_to'] = "'" + str(parse(data['free_to']).date()) + "'"
     except Exception as e:
-        transformed_data['free_to'] = '' # what's best for null?
+        transformed_data['free_to'] = 'NULL' # what's best for null?
         print(e)
     try:
         transformed_data['stay_length'] = int(data['stay_length'])
     except Exception as e:
-        transformed_data['stay_length'] = ''
+        transformed_data['stay_length'] = 'NULL'
     transformed_data['scrape_time'] = "'" + str(parse(data['scrape_time'])) + "'"
     transformed_data['flat_type'] = "'" + str(data['flat_type']) + "'"
     return transformed_data
