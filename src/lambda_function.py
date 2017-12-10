@@ -19,10 +19,7 @@ def lambda_handler(event, context):
         #Kinesis data is base64 encoded so decode here
         payload=base64.b64decode(record["kinesis"]["data"])
         print("Decoded payload: ")
-        print(str(payload))
         data = json.loads(payload)
-        print(str(data))
-        print(type(data))
         transformed = transform_wg_data(data)
         print("Loaded payload: ")
         print(str(transformed))
@@ -67,7 +64,12 @@ def transform_wg_data(data):
     transformed_data['stadt'] = "'" + str(data['stadt']) + "'"
     ## will need empty error handling here
     transformed_data['free_from'] = "'" + str(parse(data['free_from']).date()) + "'"
-    transformed_data['free_to'] = "'" + str(parse(data['free_to']).date()) + "'"
+    # this field is empty on purpose sometimes
+    try:
+        transformed_data['free_to'] = "'" + str(parse(data['free_to']).date()) + "'"
+    except Exception as e:
+        transformed_data['free_to'] = '' # what's best for null?
+        print(e)
     transformed_data['stay_length'] = int(data['stay_length'])
     transformed_data['scrape_time'] = "'" + str(parse(data['scrape_time'])) + "'"
     transformed_data['flat_type'] = "'" + str(data['flat_type']) + "'"
