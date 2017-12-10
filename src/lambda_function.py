@@ -18,10 +18,11 @@ def lambda_handler(event, context):
     for record in event['Records']:
         #Kinesis data is base64 encoded so decode here
         payload=base64.b64decode(record["kinesis"]["data"])
-        #print("Decoded payload: " + str(payload))
+        print("Decoded payload: ")
         data = json.loads(payload)
         transformed = transform_wg_data(data)
-        #print("Loaded payload: " + str(transformed))
+        print("Loaded payload: ")
+        print(str(transformed))
         query = transform_to_postgres_query(transformed_dict=transformed)
         print(query)
         loop = asyncio.get_event_loop()
@@ -63,8 +64,16 @@ def transform_wg_data(data):
     transformed_data['stadt'] = "'" + str(data['stadt']) + "'"
     ## will need empty error handling here
     transformed_data['free_from'] = "'" + str(parse(data['free_from']).date()) + "'"
-    transformed_data['free_to'] = "'" + str(parse(data['free_to']).date()) + "'"
-    transformed_data['stay_length'] = int(data['stay_length'])
+    # this field is empty on purpose sometimes
+    try:
+        transformed_data['free_to'] = "'" + str(parse(data['free_to']).date()) + "'"
+    except Exception as e:
+        transformed_data['free_to'] = 'NULL' # what's best for null?
+        print(e)
+    try:
+        transformed_data['stay_length'] = int(data['stay_length'])
+    except Exception as e:
+        transformed_data['stay_length'] = 'NULL'
     transformed_data['scrape_time'] = "'" + str(parse(data['scrape_time'])) + "'"
     transformed_data['flat_type'] = "'" + str(data['flat_type']) + "'"
     return transformed_data
